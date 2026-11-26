@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>कविता स्टॉप पजल</title>
+<style>
+  :root {
+    --bg-dark: #090d16;
+    --panel-bg: #121a2b;
+    --grid-bg: #172238;
+    --cell-empty: #0d1422;
+    --accent: #00f2fe;
+    --gold: #fbbf24;
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    background: radial-gradient(circle at top, #182744 0%, var(--bg-dark) 82%);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 10px 18px;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* Start Overlay */
+  #start-screen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #182848 0%, #070b14 90%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    touch-action: auto;
+  }
+
+  #start-screen.hidden {
+    display: none;
+  }
+
+  .start-title {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #00f2fe, #c084fc, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+
+  .start-sub {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 330px;
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+
+  .start-best-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    border-radius: 14px;
+    padding: 10px 22px;
+    margin-bottom: 24px;
+  }
+
+  .start-btn {
+    padding: 15px 42px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #07101c;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 8px 28px rgba(0, 242, 254, 0.4);
+  }
+
+  .start-btn:active {
+    transform: scale(0.96);
+  }
+
+  /* Header */
+  header {
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+  }
+
+  .game-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #00f2fe, #c084fc, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 8px 14px;
+  }
+
+  .score-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .score-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+  }
+
+  .score-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  .best-value {
+    color: var(--gold);
+  }
+
+  .top-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .mini-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Special Reserve Bar */
+  .special-bar {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.14), rgba(168, 85, 247, 0.14));
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: 14px;
+    padding: 7px 12px;
+    gap: 8px;
+  }
+
+  .special-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .special-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fde047;
+  }
+
+  .special-desc {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .special-slot-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .special-slot {
+    min-width: 64px;
+    height: 46px;
+    border-radius: 10px;
+    border: 1.5px dashed rgba(251, 191, 36, 0.65);
+    background: rgba(10, 15, 26, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    cursor: grab;
+  }
+
+  .special-slot.empty-txt {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .action-pill-btn {
+    padding: 8px 11px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    color: #111827;
+    white-space: nowrap;
+  }
+
+  .action-pill-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Board */
+  .board-wrapper {
+    position: relative;
+    padding: 9px;
+    background: var(--grid-bg);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    width: min(84vw, 336px);
+    height: min(84vw, 336px);
+  }
+
+  .cell {
+    background: var(--cell-empty);
+    border-radius: 6px;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+
+  .cell.filled {
+    box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.35);
+  }
+
+  .cell.preview-valid {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+
+  .cell.preview-invalid {
+    background: rgba(239, 68, 68, 0.38) !important;
+  }
+
+  .cell.clearing {
+    animation: clearAnim 0.32s ease forwards;
+  }
+
+  @keyframes clearAnim {
+    0% { transform: scale(1); filter: brightness(1.6); }
+    100% { transform: scale(0); opacity: 0; }
+  }
+
+  #toast {
+    position: absolute;
+    top: 44%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    color: #fde047;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.28s ease;
+    z-index: 20;
+    white-space: nowrap;
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, -75%) scale(1);
+  }
+
+  /* Bottom Tray & Rotate */
+  .bottom-section {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .tray-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+  }
+
+  .tray-hint {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+
+  .rotate-btn {
+    background: linear-gradient(90deg, #a855f7, #6366f1);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .rotate-btn:active {
+    transform: scale(0.95);
+  }
+
+  .tray {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--panel-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 10px 6px;
+    min-height: 104px;
+  }
+
+  .slot {
+    width: 31%;
+    height: 84px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    border: 2px solid transparent;
+    transition: border 0.15s, background 0.15s;
+  }
+
+  .slot.selected {
+    border-color: var(--accent);
+    background: rgba(0, 242, 254, 0.09);
+  }
+
+  .mini-grid {
+    display: grid;
+    gap: 2.5px;
+  }
+
+  .mini-cell {
+    width: 13px;
+    height: 13px;
+    border-radius: 3px;
+  }
+
+  /* Floating Drag Ghost */
+  #drag-ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 90;
+    display: none;
+    transform-origin: center;
+  }
+
+  .ghost-grid {
+    display: grid;
+    gap: 4px;
+  }
+
+  .ghost-cell {
+    border-radius: 6px;
+  }
+
+  /* Game Over Modal */
+  #gameover-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 10, 18, 0.88);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 80;
+    padding: 20px;
+  }
+
+  #gameover-modal.active {
+    display: flex;
+  }
+
+  .modal-box {
+    background: #141d30;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+
+  .modal-box h2 {
+    color: #f87171;
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+  }
+
+  .modal-box p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: space-around;
+    background: #0c1220;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 18px;
+  }
+
+  .restart-main-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 13px;
+    font-size: 1rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    color: #07101c;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- Start Screen -->
+<div id="start-screen">
+  <div class="start-title">कविता स्टॉप पजल</div>
+  <p class="start-sub">
+    ब्लॉक उठाकर रखें, रोटेट करें, और फंसने पर सिर्फ 10 पॉइंट्स में मैक्सिमम लाइन तोड़ने वाला स्पेशल ब्लॉक पाएं!
+  </p>
+  <div class="start-best-box">
+    <div class="score-label">हाई स्कोर</div>
+    <div class="score-value best-value" id="start-best">0</div>
+  </div>
+  <button class="start-btn" id="start-game-btn">▶ स्टार्ट करें</button>
+</div>
+
+<header>
+  <div class="game-title">कविता स्टॉप पजल</div>
+  <div class="score-bar">
+    <div class="score-box">
+      <span class="score-label">स्कोर</span>
+      <span class="score-value" id="score">0</span>
+    </div>
+    <div class="top-actions">
+      <button class="mini-btn" id="sound-btn" title="साउंड">🔊</button>
+      <button class="mini-btn" id="home-btn" title="स्टार्ट स्क्रीन">🏠</button>
+      <button class="mini-btn" id="restart-btn" title="रीस्टार्ट">🔄</button>
+    </div>
+    <div class="score-box">
+      <span class="score-label">हाई स्कोर</span>
+      <span class="score-value best-value" id="best-score">0</span>
+    </div>
+  </div>
+</header>
+
+<!-- Special Rescue Bar (10 Points) -->
+<div class="special-bar">
+  <div class="special-info">
+    <span class="special-title">⚡ स्पेशल रेस्क्यू ब्लॉक</span>
+    <span class="special-desc" id="special-status">फंसने पर ज़्यादा से ज़्यादा लाइन फोड़ने वाला पीस</span>
+  </div>
+  <div class="special-slot-box">
+    <div class="special-slot" id="special-slot"></div>
+    <button class="action-pill-btn" id="refill-special-btn" disabled>नया (10 अंक)</button>
+  </div>
+</div>
+
+<!-- 8x8 Board -->
+<div class="board-wrapper">
+  <div id="toast">कॉम्बो! +100</div>
+  <div id="board"></div>
+</div>
+
+<!-- Tray + Rotate -->
+<div class="bottom-section">
+  <div class="tray-header">
+    <span class="tray-hint">👆 पज़ल रखते ही उसकी जगह नया पज़ल आ जाएगा</span>
+    <button class="rotate-btn" id="rotate-btn">↻ रोटेट (90°)</button>
+  </div>
+  <div class="tray" id="tray">
+    <div class="slot" data-slot="0"></div>
+    <div class="slot" data-slot="1"></div>
+    <div class="slot" data-slot="2"></div>
+  </div>
+</div>
+
+<!-- Drag Ghost -->
+<div id="drag-ghost"></div>
+
+<!-- Game Over Modal -->
+<div id="gameover-modal">
+  <div class="modal-box">
+    <h2>गेम ओवर!</h2>
+    <p>अब कोई चाल नहीं बची</p>
+    <div class="stats-row">
+      <div class="score-box">
+        <span class="score-label">स्कोर</span>
+        <span class="score-value" id="final-score">0</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label">हाई स्कोर</span>
+        <span class="score-value best-value" id="final-best">0</span>
+      </div>
+    </div>
+    <button class="restart-main-btn" id="modal-restart-btn">फिर से खेलें</button>
+  </div>
+</div>
+
+<script>
+  const SIZE = 8;
+  const SPECIAL_COST = 10;
+  const BEST_KEY = 'kavita_stop_puzzle_highscore_v3';
+
+  const COLORS = [
+    'linear-gradient(135deg, #00f2fe, #0284c7)',
+    'linear-gradient(135deg, #f43f5e, #be123c)',
+    'linear-gradient(135deg, #a855f7, #6d28d9)',
+    'linear-gradient(135deg, #10b981, #047857)',
+    'linear-gradient(135deg, #f59e0b, #b45309)',
+    'linear-gradient(135deg, #ec4899, #9d174d)'
+  ];
+
+  const SPECIAL_COLOR = 'linear-gradient(135deg, #fde047, #f97316)';
+
+  const SHAPES = [
+    [[1]],
+    [[1, 1]],
+    [[1, 1, 1]],
+    [[1, 1, 1, 1]],
+    [[1, 1], [1, 1]],
+    [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+    [[1, 0], [1, 0], [1, 1]],
+    [[1, 1, 1], [0, 1, 0]],
+    [[1, 1, 0], [0, 1, 1]],
+    [[1, 1], [1, 0]],
+    [[1, 1, 1], [1, 0, 0]]
+  ];
+
+  let board = [];
+  let tray = [null, null, null];
+  let selectedTrayIdx = 0;
+  let specialPiece = null;
+  let score = 0;
+  let bestScore = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+  let combo = 0;
+  let soundOn = true;
+  let dragState = null;
+
+  const boardEl = document.getElementById('board');
+  const ghostEl = document.getElementById('drag-ghost');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best-score');
+  const startBestEl = document.getElementById('start-best');
+  const toastEl = document.getElementById('toast');
+  const modalEl = document.getElementById('gameover-modal');
+  const startScreenEl = document.getElementById('start-screen');
+  const specialSlotEl = document.getElementById('special-slot');
+  const refillSpecialBtn = document.getElementById('refill-special-btn');
+  const specialStatusEl = document.getElementById('special-status');
+
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function beep(freq, type = 'sine', dur = 0.1) {
+    if (!soundOn) return;
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  }
+
+  function rotateMatrix90(mat) {
+    const rows = mat.length;
+    const cols = mat[0].length;
+    const res = Array.from({ length: cols }, () => Array(rows).fill(0));
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        res[c][rows - 1 - r] = mat[r][c];
+      }
+    }
+    return res;
+  }
+
+  function getAllRotations(shape) {
+    const list = [];
+    let cur = shape.map(r => [...r]);
+    for (let i = 0; i < 4; i++) {
+      list.push(cur.map(r => [...r]));
+      cur = rotateMatrix90(cur);
+    }
+    return list;
+  }
+
+  function randomPieceForSlot(idx) {
+    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)].map(r => [...r]);
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    return { shape, color, source: 'tray', index: idx };
+  }
+
+  // Finds the shape & rotation that clears the maximum number of rows/columns on current board
+  function buildBestRescuePiece() {
+    let bestShape = [[1]];
+    let maxCleared = -1;
+    let maxCellsPlaced = -1;
+
+    for (const baseShape of SHAPES) {
+      for (const rotShape of getAllRotations(baseShape)) {
+        const rows = rotShape.length;
+        const cols = rotShape[0].length;
+        const cellCount = rotShape.flat().filter(Boolean).length;
+
+        for (let sr = 0; sr <= SIZE - rows; sr++) {
+          for (let sc = 0; sc <= SIZE - cols; sc++) {
+            if (!canPlace(rotShape, sr, sc)) continue;
+
+            // Simulate placement
+            const temp = board.map(r => [...r]);
+            for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                if (rotShape[r][c]) temp[sr + r][sc + c] = 'X';
+              }
+            }
+
+            let clearedLines = 0;
+            for (let r = 0; r < SIZE; r++) {
+              if (temp[r].every(v => v !== null)) clearedLines++;
+            }
+            for (let c = 0; c < SIZE; c++) {
+              let full = true;
+              for (let r = 0; r < SIZE; r++) {
+                if (temp[r][c] === null) { full = false; break; }
+              }
+              if (full) clearedLines++;
+            }
+
+            if (clearedLines > maxCleared || (clearedLines === maxCleared && cellCount > maxCellsPlaced)) {
+              maxCleared = clearedLines;
+              maxCellsPlaced = cellCount;
+              bestShape = rotShape.map(r => [...r]);
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      shape: bestShape,
+      color: SPECIAL_COLOR,
+      isSpecial: true,
+      clearedPreview: Math.max(0, maxCleared)
+    };
+  }
+
+  function syncHighScoreUI() {
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem(BEST_KEY, String(bestScore));
+    }
+    scoreEl.textContent = score;
+    bestEl.textContent = bestScore;
+    startBestEl.textContent = bestScore;
+    if (!specialPiece) {
+      refillSpecialBtn.disabled = score < SPECIAL_COST;
+    }
+  }
+
+  function startNewGame() {
+    board = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+    score = 0;
+    combo = 0;
+    selectedTrayIdx = 0;
+    specialPiece = buildBestRescuePiece();
+    modalEl.classList.remove('active');
+    renderBoard();
+    renderSpecialSlot();
+    initTray();
+    syncHighScoreUI();
+  }
+
+  function renderBoard() {
+    boardEl.innerHTML = '';
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        if (board[r][c]) {
+          cell.classList.add('filled');
+          cell.style.background = board[r][c];
+        }
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function renderSpecialSlot() {
+    specialSlotEl.innerHTML = '';
+    specialSlotEl.classList.remove('empty-txt');
+    if (!specialPiece) {
+      specialSlotEl.classList.add('empty-txt');
+      specialSlotEl.textContent = 'खाली';
+      specialStatusEl.textContent = `${SPECIAL_COST} अंक देकर मैक्स-लाइन रेस्क्यू पीस पाएं`;
+      refillSpecialBtn.disabled = score < SPECIAL_COST;
+      return;
+    }
+
+    const hint = specialPiece.clearedPreview > 0
+      ? `इस बोर्ड पर ${specialPiece.clearedPreview} लाइन फोड़ सकता है!`
+      : 'उठाकर (Drag) किसी भी फिट जगह रखें';
+    specialStatusEl.textContent = hint;
+    refillSpecialBtn.disabled = true;
+
+    const rows = specialPiece.shape.length;
+    const cols = specialPiece.shape[0].length;
+    const mini = document.createElement('div');
+    mini.className = 'mini-grid';
+    mini.style.gridTemplateColumns = `repeat(${cols}, 9px)`;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const mc = document.createElement('div');
+        mc.className = 'mini-cell';
+        mc.style.width = '9px';
+        mc.style.height = '9px';
+        mc.style.borderRadius = '2px';
+        if (specialPiece.shape[r][c]) {
+          mc.style.background = specialPiece.color;
+          mc.style.boxShadow = '0 0 6px rgba(251,191,36,0.75)';
+        }
+        mini.appendChild(mc);
+      }
+    }
+    specialSlotEl.appendChild(mini);
+
+    specialSlotEl.onpointerdown = (e) => {
+      e.preventDefault();
+      beginDrag(e, { ...specialPiece, source: 'special' });
+    };
+  }
+
+  function initTray() {
+    for (let i = 0; i < 3; i++) {
+      tray[i] = randomPieceForSlot(i);
+    }
+    selectedTrayIdx = 0;
+    renderTray();
+    checkGameOver();
+  }
+
+  function renderTray() {
+    const slots = document.querySelectorAll('.slot');
+    slots.forEach((slot, idx) => {
+      slot.innerHTML = '';
+      slot.classList.remove('selected');
+      slot.onpointerdown = null;
+
+      if (!tray[idx]) {
+        tray[idx] = randomPieceForSlot(idx);
+      }
+      const piece = tray[idx];
+      if (selectedTrayIdx === idx) slot.classList.add('selected');
+
+      const rows = piece.shape.length;
+      const cols = piece.shape[0].length;
+      const mini = document.createElement('div');
+      mini.className = 'mini-grid';
+      mini.style.gridTemplateColumns = `repeat(${cols}, 13px)`;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'mini-cell';
+          if (piece.shape[r][c]) {
+            cell.style.background = piece.color;
+          }
+          mini.appendChild(cell);
+        }
+      }
+      slot.appendChild(mini);
+
+      slot.onpointerdown = (e) => {
+        e.preventDefault();
+        selectedTrayIdx = idx;
+        renderTray();
+        beginDrag(e, { ...piece, source: 'tray', index: idx });
+      };
+    });
+  }
+
+  function getCellSize() {
+    const firstCell = boardEl.children[0];
+    return firstCell ? firstCell.getBoundingClientRect().width : 36;
+  }
+
+  function beginDrag(e, piece) {
+    const cellSize = getCellSize();
+    const rows = piece.shape.length;
+    const cols = piece.shape[0].length;
+
+    ghostEl.innerHTML = '';
+    const gGrid = document.createElement('div');
+    gGrid.className = 'ghost-grid';
+    gGrid.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const gc = document.createElement('div');
+        gc.className = 'ghost-cell';
+        gc.style.width = `${cellSize}px`;
+        gc.style.height = `${cellSize}px`;
+        if (piece.shape[r][c]) {
+          gc.style.background = piece.color;
+          gc.style.boxShadow = '0 6px 16px rgba(0,0,0,0.45)';
+        }
+        gGrid.appendChild(gc);
+      }
+    }
+    ghostEl.appendChild(gGrid);
+    ghostEl.style.display = 'block';
+
+    dragState = { piece, rows, cols, cellSize };
+    beep(430, 'triangle', 0.06);
+    moveDragGhost(e.clientX, e.clientY);
+  }
+
+  function getTargetTopLeft(clientX, clientY) {
+    const rect = boardEl.getBoundingClientRect();
+    const gap = 4;
+    const step = dragState.cellSize + gap;
+
+    const centerX = clientX;
+    const centerY = clientY - dragState.cellSize * 1.15;
+
+    const totalW = dragState.cols * dragState.cellSize + (dragState.cols - 1) * gap;
+    const totalH = dragState.rows * dragState.cellSize + (dragState.rows - 1) * gap;
+
+    const left = centerX - totalW / 2;
+    const top = centerY - totalH / 2;
+
+    const startC = Math.round((left - rect.left) / step);
+    const startR = Math.round((top - rect.top) / step);
+    return { left, top, startR, startC };
+  }
+
+  function clearBoardPreview() {
+    for (let i = 0; i < boardEl.children.length; i++) {
+      const cell = boardEl.children[i];
+      cell.classList.remove('preview-valid', 'preview-invalid');
+      const r = Math.floor(i / SIZE);
+      const c = i % SIZE;
+      if (!board[r][c]) cell.style.background = '';
+    }
+  }
+
+  function canPlace(shape, startR, startC) {
+    for (let r = 0; r < shape.length; r++) {
+      for (let c = 0; c < shape[0].length; c++) {
+        if (shape[r][c]) {
+          const nr = startR + r;
+          const nc = startC + c;
+          if (nr < 0 || nr >= SIZE || nc < 0 || nc >= SIZE || board[nr][nc] !== null) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  function moveDragGhost(clientX, clientY) {
+    if (!dragState) return;
+    const { left, top, startR, startC } = getTargetTopLeft(clientX, clientY);
+    ghostEl.style.left = `${left}px`;
+    ghostEl.style.top = `${top}px`;
+
+    clearBoardPreview();
+    const { shape, color } = dragState.piece;
+    const valid = canPlace(shape, startR, startC);
+
+    for (let r = 0; r < shape.length; r++) {
+      for (let c = 0; c < shape[0].length; c++) {
+        if (shape[r][c]) {
+          const nr = startR + r;
+          const nc = startC + c;
+          if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+            const cell = boardEl.children[nr * SIZE + nc];
+            if (valid) {
+              cell.classList.add('preview-valid');
+              cell.style.background = color;
+            } else if (!board[nr][nc]) {
+              cell.classList.add('preview-invalid');
+            }
+          }
+        }
+      }
+    }
+  }
+
+  window.addEventListener('pointermove', (e) => {
+    if (!dragState) return;
+    moveDragGhost(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('pointerup', (e) => {
+    if (!dragState) return;
+    const { startR, startC } = getTargetTopLeft(e.clientX, e.clientY);
+    const piece = dragState.piece;
+
+    ghostEl.style.display = 'none';
+    clearBoardPreview();
+    dragState = null;
+
+    if (canPlace(piece.shape, startR, startC)) {
+      let count = 0;
+      for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[0].length; c++) {
+          if (piece.shape[r][c]) {
+            board[startR + r][startC + c] = piece.color;
+            count++;
+          }
+        }
+      }
+
+      score += count * 10;
+      beep(540, 'sine', 0.1);
+
+      if (piece.source === 'special') {
+        specialPiece = null;
+        renderSpecialSlot();
+      } else if (piece.source === 'tray') {
+        // Immediately spawn a new puzzle in that slot so it never stays empty
+        tray[piece.index] = randomPieceForSlot(piece.index);
+        selectedTrayIdx = piece.index;
+        renderTray();
+      }
+
+      renderBoard();
+      resolveLines();
+    } else {
+      beep(170, 'sawtooth', 0.12);
+    }
+  });
+
+  function resolveLines() {
+    const fullRows = [];
+    const fullCols = [];
+
+    for (let r = 0; r < SIZE; r++) {
+      if (board[r].every(cell => cell !== null)) fullRows.push(r);
+    }
+    for (let c = 0; c < SIZE; c++) {
+      let full = true;
+      for (let r = 0; r < SIZE; r++) {
+        if (board[r][c] === null) { full = false; break; }
+      }
+      if (full) fullCols.push(c);
+    }
+
+    const total = fullRows.length + fullCols.length;
+    if (total > 0) {
+      combo++;
+      const bonus = total * 100 * combo;
+      score += bonus;
+      beep(780, 'triangle', 0.22);
+      showToast(total > 1 ? `${total}x कॉम्बो! +${bonus}` : `बेहतरीन! +${bonus}`);
+
+      const targets = new Set();
+      fullRows.forEach(r => { for (let c = 0; c < SIZE; c++) targets.add(`${r},${c}`); });
+      fullCols.forEach(c => { for (let r = 0; r < SIZE; r++) targets.add(`${r},${c}`); });
+
+      targets.forEach(key => {
+        const [r, c] = key.split(',').map(Number);
+        boardEl.children[r * SIZE + c].classList.add('clearing');
+      });
+
+      setTimeout(() => {
+        targets.forEach(key => {
+          const [r, c] = key.split(',').map(Number);
+          board[r][c] = null;
+        });
+        if (specialPiece) {
+          specialPiece = buildBestRescuePiece();
+          renderSpecialSlot();
+        }
+        syncHighScoreUI();
+        renderBoard();
+        checkGameOver();
+      }, 300);
+    } else {
+      combo = 0;
+      if (specialPiece) {
+        specialPiece = buildBestRescuePiece();
+        renderSpecialSlot();
+      }
+      syncHighScoreUI();
+      checkGameOver();
+    }
+  }
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 900);
+  }
+
+  function checkGameOver() {
+    const candidates = tray.filter(p => p !== null);
+    if (specialPiece) candidates.push(specialPiece);
+
+    for (const piece of candidates) {
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (canPlace(piece.shape, r, c)) return;
+        }
+      }
+    }
+
+    beep(180, 'sawtooth', 0.35);
+    document.getElementById('final-score').textContent = score;
+    document.getElementById('final-best').textContent = bestScore;
+    modalEl.classList.add('active');
+  }
+
+  // Rotate button
+  document.getElementById('rotate-btn').onclick = () => {
+    const piece = tray[selectedTrayIdx];
+    if (!piece) return;
+    piece.shape = rotateMatrix90(piece.shape);
+    beep(490, 'triangle', 0.08);
+    renderTray();
+    checkGameOver();
+  };
+
+  // Refill special rescue block for 10 points (auto-picks best line-clearing shape)
+  refillSpecialBtn.onclick = () => {
+    if (specialPiece || score < SPECIAL_COST) return;
+    score -= SPECIAL_COST;
+    specialPiece = buildBestRescuePiece();
+    beep(650, 'sine', 0.14);
+    renderSpecialSlot();
+    syncHighScoreUI();
+    checkGameOver();
+  };
+
+  document.getElementById('start-game-btn').onclick = () => {
+    startScreenEl.classList.add('hidden');
+    startNewGame();
+  };
+
+  document.getElementById('home-btn').onclick = () => {
+    syncHighScoreUI();
+    startScreenEl.classList.remove('hidden');
+  };
+
+  document.getElementById('restart-btn').onclick = startNewGame;
+  document.getElementById('modal-restart-btn').onclick = startNewGame;
+
+  document.getElementById('sound-btn').onclick = (e) => {
+    soundOn = !soundOn;
+    e.target.textContent = soundOn ? '🔊' : '🔇';
+  };
+
+  syncHighScoreUI();
+</script>
+</body>
+</html>
