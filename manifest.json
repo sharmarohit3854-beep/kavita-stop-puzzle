@@ -1,0 +1,11 @@
+{
+  "name": "Kavita Stop Puzzle",
+  "short_name": "Kavita Puzzle",
+  "description": "8x8 block puzzle game with rotation and rescue block.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait"
+}
