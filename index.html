@@ -6,13 +6,13 @@
 <title>कविता स्टॉप पजल</title>
   <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#090d16">
-  <script>
+<script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(() => {});
     });
   }
-  </script>
+</script>
 <style>
   :root {
     --bg-dark: #090d16;
